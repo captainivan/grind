@@ -1,14 +1,707 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>90-Day Workout Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080808;
+      --surface: #111;
+      --surface2: #161616;
+      --border: rgba(255,255,255,0.06);
+      --border2: rgba(255,255,255,0.12);
+      --accent: #c8f135;
+      --accent-dim: rgba(200,241,53,0.1);
+      --accent-dim2: rgba(200,241,53,0.06);
+      --text: #efefef;
+      --muted: #555;
+      --muted2: #888;
+      --nav-h: 64px;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse 60% 40% at 80% 10%, rgba(200,241,53,0.04) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ════════════════════════════════
+       DESKTOP LAYOUT
+    ════════════════════════════════ */
+    .shell {
+      display: flex;
+      min-height: 100vh;
+      position: relative; z-index: 1;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 260px; flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      padding: 2.5rem 1.5rem;
+      display: flex; flex-direction: column; gap: 2rem;
+      position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    }
+
+    .logo-eyebrow { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px; }
+    .logo-title { font-family: 'Bebas Neue', sans-serif; font-size: 34px; line-height: 0.95; letter-spacing: 0.02em; }
+    .logo-title span { color: var(--accent); }
+
+    .ring-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      padding: 1.5rem; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 16px;
+    }
+    .ring-svg { width: 100px; height: 100px; }
+    .ring-bg  { fill: none; stroke: var(--border2); stroke-width: 8; }
+    .ring-fill {
+      fill: none; stroke: var(--accent); stroke-width: 8;
+      stroke-linecap: round; stroke-dasharray: 283; stroke-dashoffset: 283;
+      transition: stroke-dashoffset 0.8s cubic-bezier(0.4,0,0.2,1);
+      transform: rotate(-90deg); transform-origin: 50% 50%;
+    }
+    .ring-label { font-family: 'Bebas Neue', sans-serif; font-size: 28px; fill: var(--text); text-anchor: middle; dominant-baseline: middle; }
+    .ring-sub   { font-size: 11px; fill: var(--muted2); text-anchor: middle; dominant-baseline: middle; }
+    .ring-info  { text-align: center; }
+    .ring-info .big   { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--accent); }
+    .ring-info .small { font-size: 12px; color: var(--muted2); }
+
+    .legend { display: flex; flex-direction: column; gap: 4px; }
+    .legend-title { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .legend-item {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; color: var(--muted2); cursor: pointer;
+      padding: 5px 8px; border-radius: 8px; transition: background 0.15s, color 0.15s;
+    }
+    .legend-item:hover, .legend-item.active { background: var(--surface2); color: var(--text); }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    .month-tabs { display: flex; flex-direction: column; gap: 4px; }
+    .month-tab {
+      padding: 8px 12px; border-radius: 8px; font-size: 13px; color: var(--muted2);
+      cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+      border: 1px solid transparent; transition: all 0.15s;
+    }
+    .month-tab:hover { background: var(--surface2); color: var(--text); }
+    .month-tab.active { background: var(--accent-dim); border-color: rgba(200,241,53,0.2); color: var(--accent); }
+    .month-tab-count { font-size: 11px; color: var(--muted); }
+    .month-tab.active .month-tab-count { color: var(--accent); opacity: 0.7; }
+
+    .sidebar-reset {
+      margin-top: auto; padding: 8px 14px; background: transparent;
+      border: 1px solid var(--border); border-radius: 8px; color: var(--muted);
+      font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer;
+      transition: color 0.2s, border-color 0.2s; text-align: center;
+    }
+    .sidebar-reset:hover { color: #ff6b6b; border-color: rgba(255,107,107,0.3); }
+
+    /* ── Main content ── */
+    .main { flex: 1; padding: 2.5rem 2rem 4rem; overflow-y: auto; min-width: 0; }
+
+    /* Mobile top bar — hidden on desktop */
+    .mobile-header { display: none; }
+    .mobile-nav    { display: none; }
+
+    /* ── Month sections ── */
+    .month-section { display: none; }
+    .month-section.visible { display: block; }
+
+    .month-header {
+      display: flex; align-items: baseline; gap: 16px;
+      margin-bottom: 1.5rem; padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap; gap: 8px;
+    }
+    .month-heading { font-family: 'Bebas Neue', sans-serif; font-size: 48px; line-height: 1; letter-spacing: 0.02em; }
+    .month-sub { font-size: 13px; color: var(--muted2); }
+
+    .week-block { margin-bottom: 2rem; }
+    .week-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; padding-left: 2px; }
+    .week-grid  { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px; }
+
+    /* ── Day cards ── */
+    .day-card {
+      position: relative; padding: 14px 14px 12px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.12s;
+      animation: fadeUp 0.3s both;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+    .day-card:hover:not(.is-done):not(.is-rest) { border-color: var(--border2); background: var(--surface2); transform: translateY(-1px); }
+    .day-card.is-done { background: var(--accent-dim2); border-color: rgba(200,241,53,0.18); }
+    .day-card.is-rest { opacity: 0.4; cursor: default; }
+    .day-card.is-rest:hover { transform: none; }
+
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .card-daynum { font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--muted); line-height: 1; }
+    .is-done .card-daynum { color: var(--accent); opacity: 0.7; }
+
+    .card-check { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .card-check svg { width: 9px; height: 9px; }
+
+    .card-name { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 6px; line-height: 1.2; }
+    .is-rest .card-name { color: var(--muted2); font-weight: 400; font-style: italic; }
+
+    .card-pill { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 99px; letter-spacing: 0.04em; font-weight: 400; }
+    .pill-app  { background: rgba(99,102,241,0.15);  color: #a5b4fc; }
+    .pill-hiit { background: rgba(249,115,22,0.15);  color: #fdba74; }
+    .pill-push { background: rgba(20,184,166,0.15);  color: #5eead4; }
+    .pill-pull { background: rgba(236,72,153,0.15);  color: #f9a8d4; }
+    .pill-legs { background: rgba(234,179,8,0.15);   color: #fde68a; }
+    .pill-rest { background: rgba(255,255,255,0.05); color: #555; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      align-items: flex-end; justify-content: center;
+      z-index: 300; padding: 0;
+    }
+    .modal-overlay.active { display: flex; animation: fadeIn 0.15s ease; }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+    .modal {
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: 20px 20px 0 0; padding: 2rem; width: 100%; max-width: 480px;
+      animation: slideUp 0.25s cubic-bezier(0.34,1.3,0.64,1);
+    }
+    @keyframes slideUp { from { transform: translateY(60px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+
+    /* modal drag handle */
+    .modal::before {
+      content: ''; display: block; width: 36px; height: 4px;
+      background: var(--border2); border-radius: 99px; margin: 0 auto 1.5rem;
+    }
+
+    .modal-icon  { font-size: 28px; margin-bottom: 1rem; display: block; }
+    .modal-day   { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px; }
+    .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--text); margin-bottom: 6px; }
+    .modal-desc  { font-size: 13px; color: var(--muted2); margin-bottom: 1.5rem; line-height: 1.5; }
+    .modal-desc strong { color: var(--accent); font-weight: 500; }
+
+    .modal-btns { display: flex; gap: 8px; }
+    .modal-cancel {
+      flex: 1; padding: 14px; font-size: 15px;
+      font-family: 'DM Sans', sans-serif; color: var(--muted2);
+      background: transparent; border: 1px solid var(--border2);
+      border-radius: 12px; cursor: pointer; transition: color 0.2s, border-color 0.2s;
+    }
+    .modal-cancel:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+    .modal-confirm {
+      flex: 2; padding: 14px; font-size: 15px;
+      font-family: 'DM Sans', sans-serif; font-weight: 600;
+      color: #080808; background: var(--accent);
+      border: none; border-radius: 12px; cursor: pointer;
+      transition: opacity 0.15s, transform 0.12s;
+    }
+    .modal-confirm:active { transform: scale(0.97); opacity: 0.85; }
+
+    /* ════════════════════════════════
+       MOBILE LAYOUT  (≤ 768px)
+    ════════════════════════════════ */
+    @media (max-width: 768px) {
+
+      /* hide desktop sidebar */
+      .sidebar { display: none; }
+
+      /* shell becomes single column */
+      .shell { flex-direction: column; min-height: 100vh; }
+
+      /* sticky top bar */
+      .mobile-header {
+        display: flex; align-items: center; justify-content: space-between;
+        position: sticky; top: 0; z-index: 100;
+        background: rgba(8,8,8,0.92);
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 1rem; height: var(--nav-h);
+      }
+
+      .mh-logo {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 22px; letter-spacing: 0.04em;
+      }
+      .mh-logo span { color: var(--accent); }
+
+      /* mini stats row */
+      .mh-stats {
+        display: flex; align-items: center; gap: 12px;
+      }
+
+      .mh-pct {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 18px; color: var(--accent);
+      }
+
+      .mh-streak {
+        font-size: 12px; color: var(--muted2);
+        display: flex; align-items: center; gap: 4px;
+      }
+
+      .mh-menu-btn {
+        width: 36px; height: 36px; border-radius: 8px;
+        border: 1px solid var(--border2); background: transparent;
+        color: var(--text); font-size: 16px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: background 0.15s;
+      }
+      .mh-menu-btn:hover { background: var(--surface2); }
+
+      /* slide-in drawer */
+      .mobile-drawer {
+        position: fixed; inset: 0; z-index: 200;
+        display: none;
+      }
+      .mobile-drawer.open { display: block; }
+
+      .drawer-backdrop {
+        position: absolute; inset: 0;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      }
+
+      .drawer-panel {
+        position: absolute; top: 0; right: 0; bottom: 0;
+        width: min(300px, 85vw);
+        background: var(--surface);
+        border-left: 1px solid var(--border2);
+        padding: 1.5rem 1.25rem;
+        display: flex; flex-direction: column; gap: 1.5rem;
+        overflow-y: auto;
+        animation: slideIn 0.25s cubic-bezier(0.34,1.1,0.64,1);
+      }
+      @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+      .drawer-close {
+        align-self: flex-end; width: 32px; height: 32px;
+        border-radius: 8px; border: 1px solid var(--border2);
+        background: transparent; color: var(--muted2); font-size: 14px;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+      }
+
+      /* month pill tabs — horizontal on mobile */
+      .mobile-month-tabs {
+        display: flex; gap: 6px; overflow-x: auto;
+        padding: 0 1rem 0; scrollbar-width: none;
+        position: sticky; top: var(--nav-h); z-index: 50;
+        background: rgba(8,8,8,0.92);
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 10px 1rem;
+      }
+      .mobile-month-tabs::-webkit-scrollbar { display: none; }
+
+      .mmt-pill {
+        flex-shrink: 0; padding: 6px 16px; border-radius: 99px;
+        font-size: 13px; font-weight: 500; cursor: pointer;
+        border: 1px solid var(--border2); color: var(--muted2);
+        background: transparent; font-family: 'DM Sans', sans-serif;
+        transition: all 0.15s; white-space: nowrap;
+      }
+      .mmt-pill.active {
+        background: var(--accent-dim); border-color: rgba(200,241,53,0.3);
+        color: var(--accent);
+      }
+
+      /* progress bar under tabs */
+      .mobile-progress {
+        padding: 0 1rem 10px;
+        background: rgba(8,8,8,0.92);
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      }
+      .mpb-track { height: 2px; background: var(--border2); border-radius: 99px; overflow: hidden; }
+      .mpb-fill  { height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+      .mpb-label { font-size: 11px; color: var(--muted2); margin-top: 5px; }
+      .mpb-label strong { color: var(--accent); font-weight: 500; }
+
+      /* main content */
+      .main { padding: 1.25rem 1rem 6rem; }
+
+      /* smaller month heading */
+      .month-heading { font-size: 36px; }
+
+      /* tighter card grid — 3 cols on mobile */
+      .week-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+
+      .day-card { padding: 10px 10px 8px; border-radius: 10px; }
+      .card-name { font-size: 13px; }
+      .card-daynum { font-size: 13px; }
+      .card-pill { font-size: 9px; padding: 2px 6px; }
+      .card-check { width: 15px; height: 15px; }
+      .card-check svg { width: 7px; height: 7px; }
+      .card-top { margin-bottom: 6px; }
+
+      /* bottom sheet modal stays full-width */
+      .modal { border-radius: 20px 20px 0 0; max-width: 100%; }
+      .modal-overlay { align-items: flex-end; }
+    }
+
+    /* extra small — 2 cols */
+    @media (max-width: 380px) {
+      .week-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+
+<div class="shell">
+
+  <!-- ── Desktop Sidebar ── -->
+  <aside class="sidebar">
+    <div>
+      <p class="logo-eyebrow">90-Day Program</p>
+      <h1 class="logo-title">GRIND<br><span>PLAN</span></h1>
+    </div>
+
+    <div class="ring-wrap">
+      <svg class="ring-svg" viewBox="0 0 100 100">
+        <circle class="ring-bg" cx="50" cy="50" r="45"/>
+        <circle class="ring-fill" id="ringFill" cx="50" cy="50" r="45"/>
+        <text class="ring-label" x="50" y="46" id="ringPct">0%</text>
+        <text class="ring-sub"   x="50" y="60" id="ringDone">0 done</text>
+      </svg>
+      <div class="ring-info">
+        <div class="big" id="streakNum">0</div>
+        <div class="small">day streak 🔥</div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <p class="legend-title">Filter</p>
+      <div class="legend-item active" onclick="filterType('all',this)"><span class="legend-dot" style="background:#666"></span>All days</div>
+      <div class="legend-item" onclick="filterType('App',this)"><span class="legend-dot" style="background:#a5b4fc"></span>App</div>
+      <div class="legend-item" onclick="filterType('HIIT',this)"><span class="legend-dot" style="background:#fdba74"></span>HIIT</div>
+      <div class="legend-item" onclick="filterType('Push',this)"><span class="legend-dot" style="background:#5eead4"></span>Push</div>
+      <div class="legend-item" onclick="filterType('Pull',this)"><span class="legend-dot" style="background:#f9a8d4"></span>Pull</div>
+      <div class="legend-item" onclick="filterType('Legs',this)"><span class="legend-dot" style="background:#fde68a"></span>Legs</div>
+    </div>
+
+    <div>
+      <p class="legend-title" style="margin-bottom:8px">Jump to</p>
+      <div class="month-tabs" id="monthTabs"></div>
+    </div>
+
+    <button class="sidebar-reset" id="resetBtnDesktop">↺ Reset all progress</button>
+  </aside>
+
+  <!-- ── Mobile Top Bar ── -->
+  <header class="mobile-header">
+    <div class="mh-logo">GRIND<span>PLAN</span></div>
+    <div class="mh-stats">
+      <span class="mh-pct" id="mobilePct">0%</span>
+      <span class="mh-streak"><span id="mobileStreak">0</span> 🔥</span>
+    </div>
+    <button class="mh-menu-btn" onclick="openDrawer()">☰</button>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div class="mobile-drawer" id="mobileDrawer">
+    <div class="drawer-backdrop" onclick="closeDrawer()"></div>
+    <div class="drawer-panel">
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+
+      <div class="legend">
+        <p class="legend-title">Filter by type</p>
+        <div class="legend-item active" onclick="filterType('all',this);closeDrawer()"><span class="legend-dot" style="background:#666"></span>All days</div>
+        <div class="legend-item" onclick="filterType('App',this);closeDrawer()"><span class="legend-dot" style="background:#a5b4fc"></span>App</div>
+        <div class="legend-item" onclick="filterType('HIIT',this);closeDrawer()"><span class="legend-dot" style="background:#fdba74"></span>HIIT</div>
+        <div class="legend-item" onclick="filterType('Push',this);closeDrawer()"><span class="legend-dot" style="background:#5eead4"></span>Push</div>
+        <div class="legend-item" onclick="filterType('Pull',this);closeDrawer()"><span class="legend-dot" style="background:#f9a8d4"></span>Pull</div>
+        <div class="legend-item" onclick="filterType('Legs',this);closeDrawer()"><span class="legend-dot" style="background:#fde68a"></span>Legs</div>
+      </div>
+
+      <div>
+        <p class="legend-title" style="margin-bottom:8px">Jump to month</p>
+        <div class="month-tabs" id="monthTabsMobile"></div>
+      </div>
+
+      <button class="sidebar-reset" id="resetBtnMobile" style="margin-top:0">↺ Reset all progress</button>
+    </div>
+  </div>
+
+  <!-- Mobile month pill tabs -->
+  <div class="mobile-month-tabs" id="mobileTabs" style="display:none"></div>
+  <div class="mobile-progress" id="mobileProgressBar" style="display:none">
+    <div class="mpb-track"><div class="mpb-fill" id="mpbFill" style="width:0%"></div></div>
+    <div class="mpb-label" id="mpbLabel"><strong>0</strong> / 75 sessions</div>
+  </div>
+
+  <!-- Main -->
+  <main class="main" id="mainContent"></main>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <span class="modal-icon" id="modalIcon">⚡</span>
+    <p class="modal-day" id="modalDayLabel">Day 1 · Month 1</p>
+    <div class="modal-title" id="modalTitle">Push</div>
+    <p class="modal-desc" id="modalDesc">Mark this session as completed?</p>
+    <div class="modal-btns">
+      <button class="modal-cancel" id="cancelBtn">Cancel</button>
+      <button class="modal-confirm" id="confirmBtn">Mark done ✓</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SCHEDULE  = ["App","HIIT","Push","Rest","Pull","Legs"];
+  const TOTAL     = 90;
+  const ICONS     = { App:"🧘", HIIT:"🔥", Push:"💪", Pull:"🏋️", Legs:"🦵", Rest:"😴" };
+  const PILL      = { App:"pill-app", HIIT:"pill-hiit", Push:"pill-push", Pull:"pill-pull", Legs:"pill-legs", Rest:"pill-rest" };
+
+  const PLAN = Array.from({length: TOTAL}, (_,i) => ({
+    day: i+1, month: Math.floor(i/30)+1,
+    week: Math.floor(i/7)+1, type: SCHEDULE[i%6]
+  }));
+
+  let pendingDay   = null;
+  let currentMonth = 1;
+  let activeFilter = "all";
+  const isMobile   = () => window.innerWidth <= 768;
+
+  // Storage
+  const getCompleted = () => {
+    try { return new Set(JSON.parse(localStorage.getItem("grind90")) || []); }
+    catch { return new Set(); }
+  };
+  const saveCompleted = s => localStorage.setItem("grind90", JSON.stringify([...s]));
+
+  // Streak
+  function calcStreak(completed) {
+    let streak = 0;
+    for (let d = TOTAL; d >= 1; d--) {
+      const t = PLAN[d-1].type;
+      if (t === "Rest") { if (streak > 0) break; continue; }
+      if (completed.has(d)) streak++; else break;
+    }
+    return streak;
+  }
+
+  // ── Main render ──
+  function render() {
+    const c = getCompleted();
+    renderStats(c);
+    renderSidebarTabs(c);
+    renderMobileTabs(c);
+    renderMain(c);
+  }
+
+  function renderStats(c) {
+    const workDays = PLAN.filter(d => d.type !== "Rest").length;
+    const done     = [...c].length;
+    const pct      = Math.round((done / workDays) * 100);
+    const circ     = 283;
+    const streak   = calcStreak(c);
+
+    // desktop ring
+    const rf = document.getElementById("ringFill");
+    if (rf) {
+      rf.style.strokeDashoffset = circ - (circ * pct / 100);
+      document.getElementById("ringPct").textContent  = pct + "%";
+      document.getElementById("ringDone").textContent = done + " done";
+      document.getElementById("streakNum").textContent = streak;
+    }
+
+    // mobile header
+    const mp = document.getElementById("mobilePct");
+    if (mp) {
+      mp.textContent = pct + "%";
+      document.getElementById("mobileStreak").textContent = streak;
+    }
+
+    // mobile progress bar
+    const mpb = document.getElementById("mpbFill");
+    if (mpb) {
+      mpb.style.width = pct + "%";
+      document.getElementById("mpbLabel").innerHTML = `<strong>${done}</strong> / ${workDays} sessions`;
+    }
+  }
+
+  function renderSidebarTabs(c) {
+    const el = document.getElementById("monthTabs");
+    if (!el) return;
+    el.innerHTML = "";
+    [1,2,3].forEach(m => buildTab(el, m, c, false));
+  }
+
+  function renderMobileTabs(c) {
+    const el   = document.getElementById("mobileTabs");
+    const elM  = document.getElementById("monthTabsMobile");
+    const pb   = document.getElementById("mobileProgressBar");
+    if (!el) return;
+
+    // show mobile-only elements
+    el.style.display = "flex";
+    pb.style.display = "block";
+
+    el.innerHTML = "";
+    if (elM) elM.innerHTML = "";
+
+    [1,2,3].forEach(m => {
+      // horizontal pill
+      const pill = document.createElement("button");
+      pill.className = "mmt-pill" + (m === currentMonth ? " active" : "");
+      const workDays = PLAN.filter(d => d.month === m && d.type !== "Rest");
+      const done     = workDays.filter(d => c.has(d.day)).length;
+      pill.textContent = `Month ${m}`;
+      pill.onclick = () => { currentMonth = m; render(); };
+      el.appendChild(pill);
+
+      // drawer tab
+      if (elM) buildTab(elM, m, c, true);
+    });
+  }
+
+  function buildTab(container, m, c, isMobileDrawer) {
+    const days = PLAN.filter(d => d.month === m && d.type !== "Rest");
+    const done = days.filter(d => c.has(d.day)).length;
+    const tab  = document.createElement("div");
+    tab.className = "month-tab" + (m === currentMonth ? " active" : "");
+    tab.innerHTML = `Month ${m} <span class="month-tab-count">${done}/${days.length}</span>`;
+    tab.onclick = () => {
+      currentMonth = m;
+      if (isMobileDrawer) closeDrawer();
+      render();
+    };
+    container.appendChild(tab);
+  }
+
+  function renderMain(c) {
+    const main = document.getElementById("mainContent");
+    main.innerHTML = "";
+
+    [1,2,3].forEach(month => {
+      const section  = document.createElement("div");
+      section.className = "month-section" + (month === currentMonth ? " visible" : "");
+
+      const monthDays = PLAN.filter(d => d.month === month);
+      const workDays  = monthDays.filter(d => d.type !== "Rest");
+      const done      = workDays.filter(d => c.has(d.day)).length;
+
+      section.innerHTML = `
+        <div class="month-header">
+          <div class="month-heading">Month ${month}</div>
+          <div class="month-sub">${done} / ${workDays.length} sessions · Days ${(month-1)*30+1}–${month*30}</div>
+        </div>
+      `;
+
+      // group into weeks
+      const weeks = {};
+      monthDays.forEach(d => { (weeks[d.week] ??= []).push(d); });
+
+      Object.entries(weeks).forEach(([wk, days], wi) => {
+        const filtered = activeFilter === "all"
+          ? days
+          : days.filter(d => d.type === activeFilter || d.type === "Rest");
+
+        if (!filtered.length) return;
+
+        const wb = document.createElement("div");
+        wb.className = "week-block";
+        wb.innerHTML = `<div class="week-label">Week ${wk}</div>`;
+
+        const grid = document.createElement("div");
+        grid.className = "week-grid";
+
+        filtered.forEach((d, ci) => {
+          const isDone = c.has(d.day);
+          const isRest = d.type === "Rest";
+          const card = document.createElement("div");
+          card.className = "day-card" + (isDone ? " is-done" : "") + (isRest ? " is-rest" : "");
+          card.style.animationDelay = (ci*20 + wi*40) + "ms";
+          card.innerHTML = `
+            <div class="card-top">
+              <span class="card-daynum">Day ${d.day}</span>
+              ${isDone ? `<div class="card-check"><svg viewBox="0 0 10 10" fill="none" stroke="#080808" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2.5"/></svg></div>` : ""}
+            </div>
+            <div class="card-name">${d.type}</div>
+            <span class="card-pill ${PILL[d.type]}">${d.type}</span>
+          `;
+          if (!isRest && !isDone) card.addEventListener("click", () => openModal(d));
+          grid.appendChild(card);
+        });
+
+        wb.appendChild(grid);
+        section.appendChild(wb);
+      });
+
+      main.appendChild(section);
+    });
+  }
+
+  // ── Modal ──
+  function openModal(d) {
+    pendingDay = d.day;
+    document.getElementById("modalIcon").textContent    = ICONS[d.type] || "⚡";
+    document.getElementById("modalDayLabel").textContent = `Day ${d.day} · Month ${d.month}`;
+    document.getElementById("modalTitle").textContent   = d.type;
+    document.getElementById("modalDesc").innerHTML      = `Complete <strong>${d.type}</strong> and mark Day ${d.day} as done?`;
+    document.getElementById("modalOverlay").classList.add("active");
+  }
+
+  document.getElementById("confirmBtn").addEventListener("click", () => {
+    if (pendingDay !== null) { const c = getCompleted(); c.add(pendingDay); saveCompleted(c); pendingDay = null; }
+    document.getElementById("modalOverlay").classList.remove("active");
+    render();
+  });
+
+  document.getElementById("cancelBtn").addEventListener("click", () => {
+    document.getElementById("modalOverlay").classList.remove("active");
+    pendingDay = null;
+  });
+
+  document.getElementById("modalOverlay").addEventListener("click", e => {
+    if (e.target === e.currentTarget) {
+      document.getElementById("modalOverlay").classList.remove("active");
+      pendingDay = null;
+    }
+  });
+
+  // ── Drawer ──
+  function openDrawer()  { document.getElementById("mobileDrawer").classList.add("open"); document.body.style.overflow = "hidden"; }
+  function closeDrawer() { document.getElementById("mobileDrawer").classList.remove("open"); document.body.style.overflow = ""; }
+
+  // ── Reset ──
+  function doReset() {
+    if (confirm("Reset all 90 days of progress?")) { saveCompleted(new Set()); render(); }
+  }
+  document.getElementById("resetBtnDesktop").addEventListener("click", doReset);
+  document.getElementById("resetBtnMobile").addEventListener("click",  () => { closeDrawer(); setTimeout(doReset, 150); });
+
+  // ── Filter ──
+  function filterType(type, el) {
+    activeFilter = type;
+    document.querySelectorAll(".legend-item").forEach(i => i.classList.remove("active"));
+    // activate all matching items (drawer + sidebar)
+    document.querySelectorAll(".legend-item").forEach(i => {
+      if ((i.dataset.filter === type) || (type === "all" && !i.dataset.filter) || i === el) {
+        // mark the clicked one
+      }
+    });
+    el.classList.add("active");
+    render();
+  }
+
+  render();
+</script>
 </body>
 </html>
