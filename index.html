@@ -39,9 +39,6 @@
       pointer-events: none; z-index: 0;
     }
 
-    /* ════════════════════════════════
-       DESKTOP LAYOUT
-    ════════════════════════════════ */
     .shell {
       display: flex;
       min-height: 100vh;
@@ -109,14 +106,11 @@
     }
     .sidebar-reset:hover { color: #ff6b6b; border-color: rgba(255,107,107,0.3); }
 
-    /* ── Main content ── */
     .main { flex: 1; padding: 2.5rem 2rem 4rem; overflow-y: auto; min-width: 0; }
 
-    /* Mobile top bar — hidden on desktop */
     .mobile-header { display: none; }
     .mobile-nav    { display: none; }
 
-    /* ── Month sections ── */
     .month-section { display: none; }
     .month-section.visible { display: block; }
 
@@ -133,7 +127,6 @@
     .week-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; padding-left: 2px; }
     .week-grid  { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px; }
 
-    /* ── Day cards ── */
     .day-card {
       position: relative; padding: 14px 14px 12px;
       background: var(--surface); border: 1px solid var(--border);
@@ -166,7 +159,6 @@
     .pill-legs { background: rgba(234,179,8,0.15);   color: #fde68a; }
     .pill-rest { background: rgba(255,255,255,0.05); color: #555; }
 
-    /* ── Modal ── */
     .modal-overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,0.75);
@@ -184,7 +176,6 @@
     }
     @keyframes slideUp { from { transform: translateY(60px); opacity:0; } to { transform:translateY(0); opacity:1; } }
 
-    /* modal drag handle */
     .modal::before {
       content: ''; display: block; width: 36px; height: 4px;
       background: var(--border2); border-radius: 99px; margin: 0 auto 1.5rem;
@@ -213,18 +204,10 @@
     }
     .modal-confirm:active { transform: scale(0.97); opacity: 0.85; }
 
-    /* ════════════════════════════════
-       MOBILE LAYOUT  (≤ 768px)
-    ════════════════════════════════ */
     @media (max-width: 768px) {
-
-      /* hide desktop sidebar */
       .sidebar { display: none; }
-
-      /* shell becomes single column */
       .shell { flex-direction: column; min-height: 100vh; }
 
-      /* sticky top bar */
       .mobile-header {
         display: flex; align-items: center; justify-content: space-between;
         position: sticky; top: 0; z-index: 100;
@@ -234,26 +217,12 @@
         padding: 0 1rem; height: var(--nav-h);
       }
 
-      .mh-logo {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 22px; letter-spacing: 0.04em;
-      }
+      .mh-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.04em; }
       .mh-logo span { color: var(--accent); }
 
-      /* mini stats row */
-      .mh-stats {
-        display: flex; align-items: center; gap: 12px;
-      }
-
-      .mh-pct {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 18px; color: var(--accent);
-      }
-
-      .mh-streak {
-        font-size: 12px; color: var(--muted2);
-        display: flex; align-items: center; gap: 4px;
-      }
+      .mh-stats { display: flex; align-items: center; gap: 12px; }
+      .mh-pct { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--accent); }
+      .mh-streak { font-size: 12px; color: var(--muted2); display: flex; align-items: center; gap: 4px; }
 
       .mh-menu-btn {
         width: 36px; height: 36px; border-radius: 8px;
@@ -264,11 +233,7 @@
       }
       .mh-menu-btn:hover { background: var(--surface2); }
 
-      /* slide-in drawer */
-      .mobile-drawer {
-        position: fixed; inset: 0; z-index: 200;
-        display: none;
-      }
+      .mobile-drawer { position: fixed; inset: 0; z-index: 200; display: none; }
       .mobile-drawer.open { display: block; }
 
       .drawer-backdrop {
@@ -296,10 +261,9 @@
         cursor: pointer; display: flex; align-items: center; justify-content: center;
       }
 
-      /* month pill tabs — horizontal on mobile */
       .mobile-month-tabs {
         display: flex; gap: 6px; overflow-x: auto;
-        padding: 0 1rem 0; scrollbar-width: none;
+        scrollbar-width: none;
         position: sticky; top: var(--nav-h); z-index: 50;
         background: rgba(8,8,8,0.92);
         backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -320,7 +284,6 @@
         color: var(--accent);
       }
 
-      /* progress bar under tabs */
       .mobile-progress {
         padding: 0 1rem 10px;
         background: rgba(8,8,8,0.92);
@@ -331,13 +294,8 @@
       .mpb-label { font-size: 11px; color: var(--muted2); margin-top: 5px; }
       .mpb-label strong { color: var(--accent); font-weight: 500; }
 
-      /* main content */
       .main { padding: 1.25rem 1rem 6rem; }
-
-      /* smaller month heading */
       .month-heading { font-size: 36px; }
-
-      /* tighter card grid — 3 cols on mobile */
       .week-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; }
 
       .day-card { padding: 10px 10px 8px; border-radius: 10px; }
@@ -348,21 +306,14 @@
       .card-check svg { width: 7px; height: 7px; }
       .card-top { margin-bottom: 6px; }
 
-      /* bottom sheet modal stays full-width */
       .modal { border-radius: 20px 20px 0 0; max-width: 100%; }
       .modal-overlay { align-items: flex-end; }
     }
 
-    /* extra small — 2 cols */
     @media (max-width: 380px) {
       .week-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#c8f135">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="GrindPlan">
 </head>
 <body>
 
@@ -445,7 +396,7 @@
   <div class="mobile-month-tabs" id="mobileTabs" style="display:none"></div>
   <div class="mobile-progress" id="mobileProgressBar" style="display:none">
     <div class="mpb-track"><div class="mpb-fill" id="mpbFill" style="width:0%"></div></div>
-    <div class="mpb-label" id="mpbLabel"><strong>0</strong> / 75 sessions</div>
+    <div class="mpb-label" id="mpbLabel"><strong>0</strong> / 0 sessions</div>
   </div>
 
   <!-- Main -->
@@ -468,40 +419,68 @@
 </div>
 
 <script>
-  const SCHEDULE  = ["App","HIIT","Push","Rest","Pull","Legs"];
-  const TOTAL     = 90;
-  const ICONS     = { App:"🧘", HIIT:"🔥", Push:"💪", Pull:"🏋️", Legs:"🦵", Rest:"😴" };
-  const PILL      = { App:"pill-app", HIIT:"pill-hiit", Push:"pill-push", Pull:"pill-pull", Legs:"pill-legs", Rest:"pill-rest" };
+  // ─────────────────────────────────────────────────────────
+  //  SCHEDULE: strict 3-workout → 1-rest cycle (repeating)
+  //  Workout types rotate through: App, HIIT, Push, Pull, Legs
+  //  Every 4th day in the cycle is always Rest.
+  //
+  //  Cycle pattern (0-indexed position in 4-day block):
+  //    pos 0 → workout
+  //    pos 1 → workout
+  //    pos 2 → workout
+  //    pos 3 → Rest
+  //
+  //  Workout type is determined by how many workout days have
+  //  passed so far, cycling through WORKOUT_TYPES.
+  // ─────────────────────────────────────────────────────────
+  const WORKOUT_TYPES = ["App", "HIIT", "Push", "Pull", "Legs"];
+  const TOTAL = 90;
+  const ICONS = { App:"🧘", HIIT:"🔥", Push:"💪", Pull:"🏋️", Legs:"🦵", Rest:"😴" };
+  const PILL  = { App:"pill-app", HIIT:"pill-hiit", Push:"pill-push", Pull:"pill-pull", Legs:"pill-legs", Rest:"pill-rest" };
 
-  const PLAN = Array.from({length: TOTAL}, (_,i) => ({
-    day: i+1, month: Math.floor(i/30)+1,
-    week: Math.floor(i/7)+1, type: SCHEDULE[i%6]
-  }));
+  // Build the 90-day plan with 3-on / 1-rest cycle
+  function buildPlan() {
+    const plan = [];
+    let workoutCount = 0; // tracks how many workout days assigned so far
+
+    for (let i = 0; i < TOTAL; i++) {
+      const posInBlock = i % 4; // 0,1,2 = workout; 3 = rest
+      const type = posInBlock === 3
+        ? "Rest"
+        : WORKOUT_TYPES[workoutCount++ % WORKOUT_TYPES.length];
+
+      plan.push({
+        day:   i + 1,
+        month: Math.floor(i / 30) + 1,
+        week:  Math.floor(i / 7) + 1,
+        type
+      });
+    }
+    return plan;
+  }
+
+  const PLAN = buildPlan();
 
   let pendingDay   = null;
   let currentMonth = 1;
   let activeFilter = "all";
-  const isMobile   = () => window.innerWidth <= 768;
 
-  // Storage
-  const getCompleted = () => {
-    try { return new Set(JSON.parse(localStorage.getItem("grind90")) || []); }
-    catch { return new Set(); }
-  };
-  const saveCompleted = s => localStorage.setItem("grind90", JSON.stringify([...s]));
+  // ── Storage ──
+  const getCompleted  = () => { try { return new Set(JSON.parse(localStorage.getItem("grind90")) || []); } catch { return new Set(); } };
+  const saveCompleted = s  => localStorage.setItem("grind90", JSON.stringify([...s]));
 
-  // Streak
+  // ── Streak: count consecutive completed workout days from the end ──
   function calcStreak(completed) {
     let streak = 0;
     for (let d = TOTAL; d >= 1; d--) {
-      const t = PLAN[d-1].type;
+      const t = PLAN[d - 1].type;
       if (t === "Rest") { if (streak > 0) break; continue; }
       if (completed.has(d)) streak++; else break;
     }
     return streak;
   }
 
-  // ── Main render ──
+  // ── Render ──
   function render() {
     const c = getCompleted();
     renderStats(c);
@@ -517,23 +496,20 @@
     const circ     = 283;
     const streak   = calcStreak(c);
 
-    // desktop ring
     const rf = document.getElementById("ringFill");
     if (rf) {
       rf.style.strokeDashoffset = circ - (circ * pct / 100);
-      document.getElementById("ringPct").textContent  = pct + "%";
-      document.getElementById("ringDone").textContent = done + " done";
+      document.getElementById("ringPct").textContent   = pct + "%";
+      document.getElementById("ringDone").textContent  = done + " done";
       document.getElementById("streakNum").textContent = streak;
     }
 
-    // mobile header
     const mp = document.getElementById("mobilePct");
     if (mp) {
       mp.textContent = pct + "%";
       document.getElementById("mobileStreak").textContent = streak;
     }
 
-    // mobile progress bar
     const mpb = document.getElementById("mpbFill");
     if (mpb) {
       mpb.style.width = pct + "%";
@@ -545,33 +521,26 @@
     const el = document.getElementById("monthTabs");
     if (!el) return;
     el.innerHTML = "";
-    [1,2,3].forEach(m => buildTab(el, m, c, false));
+    [1, 2, 3].forEach(m => buildTab(el, m, c, false));
   }
 
   function renderMobileTabs(c) {
-    const el   = document.getElementById("mobileTabs");
-    const elM  = document.getElementById("monthTabsMobile");
-    const pb   = document.getElementById("mobileProgressBar");
+    const el  = document.getElementById("mobileTabs");
+    const elM = document.getElementById("monthTabsMobile");
+    const pb  = document.getElementById("mobileProgressBar");
     if (!el) return;
 
-    // show mobile-only elements
     el.style.display = "flex";
     pb.style.display = "block";
-
     el.innerHTML = "";
     if (elM) elM.innerHTML = "";
 
-    [1,2,3].forEach(m => {
-      // horizontal pill
+    [1, 2, 3].forEach(m => {
       const pill = document.createElement("button");
       pill.className = "mmt-pill" + (m === currentMonth ? " active" : "");
-      const workDays = PLAN.filter(d => d.month === m && d.type !== "Rest");
-      const done     = workDays.filter(d => c.has(d.day)).length;
       pill.textContent = `Month ${m}`;
       pill.onclick = () => { currentMonth = m; render(); };
       el.appendChild(pill);
-
-      // drawer tab
       if (elM) buildTab(elM, m, c, true);
     });
   }
@@ -582,11 +551,7 @@
     const tab  = document.createElement("div");
     tab.className = "month-tab" + (m === currentMonth ? " active" : "");
     tab.innerHTML = `Month ${m} <span class="month-tab-count">${done}/${days.length}</span>`;
-    tab.onclick = () => {
-      currentMonth = m;
-      if (isMobileDrawer) closeDrawer();
-      render();
-    };
+    tab.onclick = () => { currentMonth = m; if (isMobileDrawer) closeDrawer(); render(); };
     container.appendChild(tab);
   }
 
@@ -594,8 +559,8 @@
     const main = document.getElementById("mainContent");
     main.innerHTML = "";
 
-    [1,2,3].forEach(month => {
-      const section  = document.createElement("div");
+    [1, 2, 3].forEach(month => {
+      const section   = document.createElement("div");
       section.className = "month-section" + (month === currentMonth ? " visible" : "");
 
       const monthDays = PLAN.filter(d => d.month === month);
@@ -605,11 +570,10 @@
       section.innerHTML = `
         <div class="month-header">
           <div class="month-heading">Month ${month}</div>
-          <div class="month-sub">${done} / ${workDays.length} sessions · Days ${(month-1)*30+1}–${month*30}</div>
+          <div class="month-sub">${done} / ${workDays.length} sessions · Days ${(month - 1) * 30 + 1}–${month * 30}</div>
         </div>
       `;
 
-      // group into weeks
       const weeks = {};
       monthDays.forEach(d => { (weeks[d.week] ??= []).push(d); });
 
@@ -632,7 +596,7 @@
           const isRest = d.type === "Rest";
           const card = document.createElement("div");
           card.className = "day-card" + (isDone ? " is-done" : "") + (isRest ? " is-rest" : "");
-          card.style.animationDelay = (ci*20 + wi*40) + "ms";
+          card.style.animationDelay = (ci * 20 + wi * 40) + "ms";
           card.innerHTML = `
             <div class="card-top">
               <span class="card-daynum">Day ${d.day}</span>
@@ -656,10 +620,10 @@
   // ── Modal ──
   function openModal(d) {
     pendingDay = d.day;
-    document.getElementById("modalIcon").textContent    = ICONS[d.type] || "⚡";
+    document.getElementById("modalIcon").textContent     = ICONS[d.type] || "⚡";
     document.getElementById("modalDayLabel").textContent = `Day ${d.day} · Month ${d.month}`;
-    document.getElementById("modalTitle").textContent   = d.type;
-    document.getElementById("modalDesc").innerHTML      = `Complete <strong>${d.type}</strong> and mark Day ${d.day} as done?`;
+    document.getElementById("modalTitle").textContent    = d.type;
+    document.getElementById("modalDesc").innerHTML       = `Complete <strong>${d.type}</strong> and mark Day ${d.day} as done?`;
     document.getElementById("modalOverlay").classList.add("active");
   }
 
@@ -690,28 +654,17 @@
     if (confirm("Reset all 90 days of progress?")) { saveCompleted(new Set()); render(); }
   }
   document.getElementById("resetBtnDesktop").addEventListener("click", doReset);
-  document.getElementById("resetBtnMobile").addEventListener("click",  () => { closeDrawer(); setTimeout(doReset, 150); });
+  document.getElementById("resetBtnMobile").addEventListener("click", () => { closeDrawer(); setTimeout(doReset, 150); });
 
   // ── Filter ──
   function filterType(type, el) {
     activeFilter = type;
     document.querySelectorAll(".legend-item").forEach(i => i.classList.remove("active"));
-    // activate all matching items (drawer + sidebar)
-    document.querySelectorAll(".legend-item").forEach(i => {
-      if ((i.dataset.filter === type) || (type === "all" && !i.dataset.filter) || i === el) {
-        // mark the clicked one
-      }
-    });
     el.classList.add("active");
     render();
   }
 
   render();
-</script>
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js');
-  }
 </script>
 </body>
 </html>
