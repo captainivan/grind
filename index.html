@@ -18,6 +18,11 @@
       --accent: #c8f135;
       --accent-dim: rgba(200,241,53,0.1);
       --accent-dim2: rgba(200,241,53,0.06);
+      --rest-color: #818cf8;
+      --rest-dim: rgba(129,140,248,0.12);
+      --rest-dim2: rgba(129,140,248,0.06);
+      --like-color: #f472b6;
+      --like-dim: rgba(244,114,182,0.15);
       --text: #efefef;
       --muted: #555;
       --muted2: #888;
@@ -137,20 +142,70 @@
     }
     @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-    .day-card:hover:not(.is-done):not(.is-rest) { border-color: var(--border2); background: var(--surface2); transform: translateY(-1px); }
+    .day-card:hover:not(.is-done):not(.is-rest-liked) { border-color: var(--border2); background: var(--surface2); transform: translateY(-1px); }
     .day-card.is-done { background: var(--accent-dim2); border-color: rgba(200,241,53,0.18); }
-    .day-card.is-rest { opacity: 0.4; cursor: default; }
-    .day-card.is-rest:hover { transform: none; }
+
+    /* Rest card — always clickable now */
+    .day-card.is-rest {
+      opacity: 1;
+      cursor: pointer;
+      border-color: rgba(129,140,248,0.12);
+    }
+    .day-card.is-rest:hover:not(.is-rest-liked) {
+      border-color: rgba(129,140,248,0.3);
+      background: var(--rest-dim2);
+      transform: translateY(-1px);
+    }
+    .day-card.is-rest-liked {
+      background: var(--rest-dim2);
+      border-color: rgba(129,140,248,0.28);
+    }
 
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
     .card-daynum { font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--muted); line-height: 1; }
     .is-done .card-daynum { color: var(--accent); opacity: 0.7; }
+    .is-rest-liked .card-daynum { color: var(--rest-color); opacity: 0.7; }
 
     .card-check { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .card-check svg { width: 9px; height: 9px; }
 
+    /* Like heart badge */
+    .card-like-badge {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--like-dim);
+      border: 1px solid rgba(244,114,182,0.4);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      font-size: 9px; line-height: 1;
+    }
+
+    /* Like button on rest cards (bottom right) */
+    .card-like-btn {
+      position: absolute; bottom: 10px; right: 10px;
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 1px solid var(--border2); background: transparent;
+      color: var(--muted2); font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .card-like-btn:hover { background: var(--like-dim); border-color: rgba(244,114,182,0.4); color: var(--like-color); transform: scale(1.15); }
+    .card-like-btn.liked { background: var(--like-dim); border-color: rgba(244,114,182,0.5); color: var(--like-color); }
+    .card-like-btn.liked:hover { transform: scale(1.1); }
+
+    /* Workout card like button */
+    .card-like-workout {
+      position: absolute; bottom: 10px; right: 10px;
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 1px solid var(--border2); background: transparent;
+      color: var(--muted2); font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+      z-index: 2;
+    }
+    .card-like-workout:hover { background: var(--like-dim); border-color: rgba(244,114,182,0.4); color: var(--like-color); transform: scale(1.15); }
+    .card-like-workout.liked { background: var(--like-dim); border-color: rgba(244,114,182,0.5); color: var(--like-color); }
+
     .card-name { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 6px; line-height: 1.2; }
-    .is-rest .card-name { color: var(--muted2); font-weight: 400; font-style: italic; }
+    .is-rest .card-name { color: #818cf8; font-weight: 400; }
 
     .card-pill { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 99px; letter-spacing: 0.04em; font-weight: 400; }
     .pill-app  { background: rgba(99,102,241,0.15);  color: #a5b4fc; }
@@ -158,7 +213,16 @@
     .pill-push { background: rgba(20,184,166,0.15);  color: #5eead4; }
     .pill-pull { background: rgba(236,72,153,0.15);  color: #f9a8d4; }
     .pill-legs { background: rgba(234,179,8,0.15);   color: #fde68a; }
-    .pill-rest { background: rgba(255,255,255,0.05); color: #555; }
+    .pill-rest { background: rgba(129,140,248,0.1);  color: #818cf8; }
+
+    /* Heart pop animation */
+    @keyframes heartPop {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.4); }
+      70%  { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+    .heart-pop { animation: heartPop 0.35s cubic-bezier(0.34,1.4,0.64,1); }
 
     .modal-overlay {
       display: none; position: fixed; inset: 0;
@@ -187,6 +251,7 @@
     .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--text); margin-bottom: 6px; }
     .modal-desc  { font-size: 13px; color: var(--muted2); margin-bottom: 1.5rem; line-height: 1.5; }
     .modal-desc strong { color: var(--accent); font-weight: 500; }
+    .modal-desc.rest-modal strong { color: var(--rest-color); }
 
     .modal-btns { display: flex; gap: 8px; }
     .modal-cancel {
@@ -202,6 +267,9 @@
       color: #080808; background: var(--accent);
       border: none; border-radius: 12px; cursor: pointer;
       transition: opacity 0.15s, transform 0.12s;
+    }
+    .modal-confirm.rest-confirm {
+      background: var(--rest-color);
     }
     .modal-confirm:active { transform: scale(0.97); opacity: 0.85; }
 
@@ -348,6 +416,7 @@
       <div class="legend-item" onclick="filterType('Push',this)"><span class="legend-dot" style="background:#5eead4"></span>Push</div>
       <div class="legend-item" onclick="filterType('Pull',this)"><span class="legend-dot" style="background:#f9a8d4"></span>Pull</div>
       <div class="legend-item" onclick="filterType('Legs',this)"><span class="legend-dot" style="background:#fde68a"></span>Legs</div>
+      <div class="legend-item" onclick="filterType('Rest',this)"><span class="legend-dot" style="background:#818cf8"></span>Rest</div>
     </div>
 
     <div>
@@ -382,6 +451,7 @@
         <div class="legend-item" onclick="filterType('Push',this);closeDrawer()"><span class="legend-dot" style="background:#5eead4"></span>Push</div>
         <div class="legend-item" onclick="filterType('Pull',this);closeDrawer()"><span class="legend-dot" style="background:#f9a8d4"></span>Pull</div>
         <div class="legend-item" onclick="filterType('Legs',this);closeDrawer()"><span class="legend-dot" style="background:#fde68a"></span>Legs</div>
+        <div class="legend-item" onclick="filterType('Rest',this);closeDrawer()"><span class="legend-dot" style="background:#818cf8"></span>Rest</div>
       </div>
 
       <div>
@@ -420,42 +490,20 @@
 </div>
 
 <script>
-  // ─────────────────────────────────────────────────────────
-  //  SCHEDULE: strict 3-workout → 1-rest cycle (repeating)
-  //  Workout types rotate through: App, HIIT, Push, Pull, Legs
-  //  Every 4th day in the cycle is always Rest.
-  //
-  //  Cycle pattern (0-indexed position in 4-day block):
-  //    pos 0 → workout
-  //    pos 1 → workout
-  //    pos 2 → workout
-  //    pos 3 → Rest
-  //
-  //  Workout type is determined by how many workout days have
-  //  passed so far, cycling through WORKOUT_TYPES.
-  // ─────────────────────────────────────────────────────────
   const WORKOUT_TYPES = ["App", "HIIT", "Push", "Pull", "Legs"];
   const TOTAL = 90;
   const ICONS = { App:"🧘", HIIT:"🔥", Push:"💪", Pull:"🏋️", Legs:"🦵", Rest:"😴" };
   const PILL  = { App:"pill-app", HIIT:"pill-hiit", Push:"pill-push", Pull:"pill-pull", Legs:"pill-legs", Rest:"pill-rest" };
 
-  // Build the 90-day plan with 3-on / 1-rest cycle
   function buildPlan() {
     const plan = [];
-    let workoutCount = 0; // tracks how many workout days assigned so far
-
+    let workoutCount = 0;
     for (let i = 0; i < TOTAL; i++) {
-      const posInBlock = i % 4; // 0,1,2 = workout; 3 = rest
+      const posInBlock = i % 4;
       const type = posInBlock === 3
         ? "Rest"
         : WORKOUT_TYPES[workoutCount++ % WORKOUT_TYPES.length];
-
-      plan.push({
-        day:   i + 1,
-        month: Math.floor(i / 30) + 1,
-        week:  Math.floor(i / 7) + 1,
-        type
-      });
+      plan.push({ day: i + 1, month: Math.floor(i / 30) + 1, week: Math.floor(i / 7) + 1, type });
     }
     return plan;
   }
@@ -463,6 +511,7 @@
   const PLAN = buildPlan();
 
   let pendingDay   = null;
+  let pendingType  = null; // 'workout' | 'rest' | 'like' | 'unlike'
   let currentMonth = 1;
   let activeFilter = "all";
 
@@ -470,7 +519,15 @@
   const getCompleted  = () => { try { return new Set(JSON.parse(localStorage.getItem("grind90")) || []); } catch { return new Set(); } };
   const saveCompleted = s  => localStorage.setItem("grind90", JSON.stringify([...s]));
 
-  // ── Streak: count consecutive completed workout days from the end ──
+  // Liked days (both workout and rest)
+  const getLiked  = () => { try { return new Set(JSON.parse(localStorage.getItem("grind90_liked")) || []); } catch { return new Set(); } };
+  const saveLiked = s  => localStorage.setItem("grind90_liked", JSON.stringify([...s]));
+
+  // Rest days marked as taken
+  const getRested  = () => { try { return new Set(JSON.parse(localStorage.getItem("grind90_rest")) || []); } catch { return new Set(); } };
+  const saveRested = s  => localStorage.setItem("grind90_rest", JSON.stringify([...s]));
+
+  // ── Streak ──
   function calcStreak(completed) {
     let streak = 0;
     for (let d = TOTAL; d >= 1; d--) {
@@ -504,13 +561,11 @@
       document.getElementById("ringDone").textContent  = done + " done";
       document.getElementById("streakNum").textContent = streak;
     }
-
     const mp = document.getElementById("mobilePct");
     if (mp) {
       mp.textContent = pct + "%";
       document.getElementById("mobileStreak").textContent = streak;
     }
-
     const mpb = document.getElementById("mpbFill");
     if (mpb) {
       mpb.style.width = pct + "%";
@@ -530,12 +585,10 @@
     const elM = document.getElementById("monthTabsMobile");
     const pb  = document.getElementById("mobileProgressBar");
     if (!el) return;
-
     el.style.display = "flex";
     pb.style.display = "block";
     el.innerHTML = "";
     if (elM) elM.innerHTML = "";
-
     [1, 2, 3].forEach(m => {
       const pill = document.createElement("button");
       pill.className = "mmt-pill" + (m === currentMonth ? " active" : "");
@@ -557,7 +610,9 @@
   }
 
   function renderMain(c) {
-    const main = document.getElementById("mainContent");
+    const liked  = getLiked();
+    const rested = getRested();
+    const main   = document.getElementById("mainContent");
     main.innerHTML = "";
 
     [1, 2, 3].forEach(month => {
@@ -581,7 +636,7 @@
       Object.entries(weeks).forEach(([wk, days], wi) => {
         const filtered = activeFilter === "all"
           ? days
-          : days.filter(d => d.type === activeFilter || d.type === "Rest");
+          : days.filter(d => d.type === activeFilter || (activeFilter === "Rest" && d.type === "Rest"));
 
         if (!filtered.length) return;
 
@@ -593,20 +648,65 @@
         grid.className = "week-grid";
 
         filtered.forEach((d, ci) => {
-          const isDone = c.has(d.day);
-          const isRest = d.type === "Rest";
+          const isDone   = c.has(d.day);
+          const isRest   = d.type === "Rest";
+          const isLiked  = liked.has(d.day);
+          const isRested = rested.has(d.day);
+
           const card = document.createElement("div");
-          card.className = "day-card" + (isDone ? " is-done" : "") + (isRest ? " is-rest" : "");
           card.style.animationDelay = (ci * 20 + wi * 40) + "ms";
-          card.innerHTML = `
-            <div class="card-top">
-              <span class="card-daynum">Day ${d.day}</span>
-              ${isDone ? `<div class="card-check"><svg viewBox="0 0 10 10" fill="none" stroke="#080808" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2.5"/></svg></div>` : ""}
-            </div>
-            <div class="card-name">${d.type}</div>
-            <span class="card-pill ${PILL[d.type]}">${d.type}</span>
-          `;
-          if (!isRest && !isDone) card.addEventListener("click", () => openModal(d));
+
+          if (isRest) {
+            card.className = "day-card is-rest" + (isRested ? " is-rest-liked" : "");
+            card.innerHTML = `
+              <div class="card-top">
+                <span class="card-daynum">Day ${d.day}</span>
+                ${isRested ? `<div class="card-like-badge">✓</div>` : ""}
+              </div>
+              <div class="card-name">${isRested ? "Rested ✓" : "Rest"}</div>
+              <span class="card-pill pill-rest">Rest</span>
+              <button class="card-like-btn${isLiked ? " liked" : ""}" title="${isLiked ? "Unlike" : "Like"}" data-day="${d.day}">
+                ${isLiked ? "♥" : "♡"}
+              </button>
+            `;
+            // Click card body → toggle rest taken
+            card.addEventListener("click", (e) => {
+              if (e.target.closest(".card-like-btn")) return; // handled by button
+              openRestModal(d, isRested);
+            });
+            // Like button
+            const likeBtn = card.querySelector(".card-like-btn");
+            likeBtn.addEventListener("click", (e) => {
+              e.stopPropagation();
+              toggleLike(d.day, likeBtn);
+            });
+
+          } else {
+            card.className = "day-card" + (isDone ? " is-done" : "");
+            card.innerHTML = `
+              <div class="card-top">
+                <span class="card-daynum">Day ${d.day}</span>
+                ${isDone ? `<div class="card-check"><svg viewBox="0 0 10 10" fill="none" stroke="#080808" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2.5"/></svg></div>` : ""}
+              </div>
+              <div class="card-name">${d.type}</div>
+              <span class="card-pill ${PILL[d.type]}">${d.type}</span>
+              <button class="card-like-workout${isLiked ? " liked" : ""}" title="${isLiked ? "Unlike" : "Like"}" data-day="${d.day}">
+                ${isLiked ? "♥" : "♡"}
+              </button>
+            `;
+            if (!isDone) {
+              card.addEventListener("click", (e) => {
+                if (e.target.closest(".card-like-workout")) return;
+                openModal(d);
+              });
+            }
+            const likeBtn = card.querySelector(".card-like-workout");
+            likeBtn.addEventListener("click", (e) => {
+              e.stopPropagation();
+              toggleLike(d.day, likeBtn);
+            });
+          }
+
           grid.appendChild(card);
         });
 
@@ -618,31 +718,86 @@
     });
   }
 
-  // ── Modal ──
+  // ── Toggle Like ──
+  function toggleLike(dayNum, btn) {
+    const liked = getLiked();
+    if (liked.has(dayNum)) {
+      liked.delete(dayNum);
+      btn.textContent = "♡";
+      btn.classList.remove("liked");
+    } else {
+      liked.add(dayNum);
+      btn.textContent = "♥";
+      btn.classList.add("liked");
+      // pop animation
+      btn.classList.remove("heart-pop");
+      void btn.offsetWidth;
+      btn.classList.add("heart-pop");
+      btn.addEventListener("animationend", () => btn.classList.remove("heart-pop"), { once: true });
+    }
+    saveLiked(liked);
+  }
+
+  // ── Rest Modal ──
+  function openRestModal(d, isCurrentlyRested) {
+    pendingDay  = d.day;
+    pendingType = isCurrentlyRested ? "unrest" : "rest";
+
+    document.getElementById("modalIcon").textContent     = "😴";
+    document.getElementById("modalDayLabel").textContent = `Day ${d.day} · Month ${d.month}`;
+    document.getElementById("modalTitle").textContent    = "Rest Day";
+    document.getElementById("modalDesc").className       = "modal-desc rest-modal";
+
+    if (isCurrentlyRested) {
+      document.getElementById("modalDesc").innerHTML  = `Unmark <strong>Day ${d.day}</strong> as rested?`;
+      document.getElementById("confirmBtn").textContent = "Unmark ✕";
+      document.getElementById("confirmBtn").className  = "modal-confirm";
+    } else {
+      document.getElementById("modalDesc").innerHTML  = `Mark <strong>Day ${d.day}</strong> as your rest day? Recovery is part of the program 💜`;
+      document.getElementById("confirmBtn").textContent = "Mark rested ✓";
+      document.getElementById("confirmBtn").className  = "modal-confirm rest-confirm";
+    }
+    document.getElementById("modalOverlay").classList.add("active");
+  }
+
+  // ── Workout Modal ──
   function openModal(d) {
-    pendingDay = d.day;
+    pendingDay  = d.day;
+    pendingType = "workout";
     document.getElementById("modalIcon").textContent     = ICONS[d.type] || "⚡";
     document.getElementById("modalDayLabel").textContent = `Day ${d.day} · Month ${d.month}`;
     document.getElementById("modalTitle").textContent    = d.type;
+    document.getElementById("modalDesc").className       = "modal-desc";
     document.getElementById("modalDesc").innerHTML       = `Complete <strong>${d.type}</strong> and mark Day ${d.day} as done?`;
+    document.getElementById("confirmBtn").textContent    = "Mark done ✓";
+    document.getElementById("confirmBtn").className      = "modal-confirm";
     document.getElementById("modalOverlay").classList.add("active");
   }
 
   document.getElementById("confirmBtn").addEventListener("click", () => {
-    if (pendingDay !== null) { const c = getCompleted(); c.add(pendingDay); saveCompleted(c); pendingDay = null; }
+    if (pendingDay !== null) {
+      if (pendingType === "workout") {
+        const c = getCompleted(); c.add(pendingDay); saveCompleted(c);
+      } else if (pendingType === "rest") {
+        const r = getRested(); r.add(pendingDay); saveRested(r);
+      } else if (pendingType === "unrest") {
+        const r = getRested(); r.delete(pendingDay); saveRested(r);
+      }
+      pendingDay = null; pendingType = null;
+    }
     document.getElementById("modalOverlay").classList.remove("active");
     render();
   });
 
   document.getElementById("cancelBtn").addEventListener("click", () => {
     document.getElementById("modalOverlay").classList.remove("active");
-    pendingDay = null;
+    pendingDay = null; pendingType = null;
   });
 
   document.getElementById("modalOverlay").addEventListener("click", e => {
     if (e.target === e.currentTarget) {
       document.getElementById("modalOverlay").classList.remove("active");
-      pendingDay = null;
+      pendingDay = null; pendingType = null;
     }
   });
 
@@ -652,7 +807,12 @@
 
   // ── Reset ──
   function doReset() {
-    if (confirm("Reset all 90 days of progress?")) { saveCompleted(new Set()); render(); }
+    if (confirm("Reset all 90 days of progress (workouts, rest days, and likes)?")) {
+      saveCompleted(new Set());
+      saveRested(new Set());
+      saveLiked(new Set());
+      render();
+    }
   }
   document.getElementById("resetBtnDesktop").addEventListener("click", doReset);
   document.getElementById("resetBtnMobile").addEventListener("click", () => { closeDrawer(); setTimeout(doReset, 150); });
